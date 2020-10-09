@@ -52,9 +52,12 @@ def navigation_edges(level, cell):
              ... ]
     """
 
-    #check to see if the neighboring cell is a wall "X" or waypoint "a,b,c,d,e"
-    #we will return 8 tuples
-    #weight of each cell is given in txt file
+    #check to see if the neighboring cell is a wall (X), waypoint (a,b,c,d,e), or a cell with a given cost
+    #we will return 8 tuples (up, left right, up-left, up-right, down-left, and down-right)
+    #all waypoints are assumed to have a cost of 1
+    #to find the path cost computation, we need to use the euclidean distance formula
+    #path cost computation for horizontal or vertical movement: 0.5 * (cost of cell 1 + cost cell 2)
+    #path cost computation for diagonal movement: 0.5*sqrt(2) * (cost of cell 1 + cost of cell 2)
     pass
 
 
