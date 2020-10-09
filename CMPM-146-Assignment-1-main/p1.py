@@ -51,6 +51,10 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
+
+    #check to see if the neighboring cell is a wall "X" or waypoint "a,b,c,d,e"
+    #we will return 8 tuples
+    #weight of each cell is given in txt file
     pass
 
 
