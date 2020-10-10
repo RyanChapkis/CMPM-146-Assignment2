@@ -1,6 +1,7 @@
 from p1_support import load_level, show_level, save_level_costs
 from math import inf, sqrt
 from heapq import heappop, heappush
+from itertools import product, starmap, islice
 
 
 def dijkstras_shortest_path(initial_position, destination, graph, adj):
@@ -33,6 +34,91 @@ def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     """
     pass
 
+def merge(list1, list2): 
+    """ Merges the list of all neighboring cells, and their corresponding costs
+
+    Args: 
+        list1: list of neigbor cells
+        list2: list of costs
+    """  
+    merged_list = [(list1[i], list2[i]) for i in range(0, len(list1))] 
+    return merged_list 
+
+
+def level_to_list(level):
+    """ converts level to a 2d list/grid that is easier to navigate and augment.
+
+    Args:
+        level: The level to be converted to a list.
+    """
+    xs, ys = zip(*(list(level['spaces'].keys()) + list(level['walls'])))
+    x_lo, x_hi = min(xs), max(xs)
+    y_lo, y_hi = min(ys), max(ys)
+
+    chars = []
+    inverted_waypoints = {point: char for char, point in level['waypoints'].items()}
+
+    for j in range(y_lo, y_hi + 1):
+        for i in range(x_lo, x_hi + 1):
+
+            cell = (i, j)
+            if cell in level['walls']:
+                chars.append('X')
+            elif cell in inverted_waypoints:
+                chars.append(inverted_waypoints[cell])
+            elif cell in level['spaces']:
+                chars.append(str(int(level['spaces'][cell])))
+            else:
+                continue
+        chars.append('\n')
+
+    str1 = ""
+    str_to_list = str1.join(chars)
+    
+    rows = str_to_list.split()
+
+    return_list = [[c for c in line.strip()] for line in rows]
+    
+    return(return_list)
+
+
+def findNeighbors(grid, x, y):
+    """ Helper function that returns all the neighbors around a given cell in a grid as well as the neighbor's 
+    respective costs.
+
+    Args:
+        grid: A 2D list constructed from the level provided in navigation_edges
+        x: the x position of the cell provided in navigation_edges
+        y: the y position of the cell provided in navigation_edges
+
+    Returns:
+        A list of tuples containing an adjacent cell's coordinates and the cost of the edge joining it and the
+        originating cell.
+    """
+    costs = []
+    neighbors = []
+    if 0 < x < len(grid) - 1:
+        xi = (0, -1, 1)   # this isn't first or last row, so we can look above and below
+    elif x > 0:
+        xi = (0, -1)      # this is the last row, so we can only look above
+    else:
+        xi = (0, 1)       # this is the first row, so we can only look below
+    # the following line accomplishes the same thing as the above code but for columns
+    if 0 < y < len(grid[0]) - 1:
+        yi = (0, -1, 1)
+    elif y > 0:
+        yi = (0, -1)
+    else:
+        yi = (0, 1)
+    for a in xi:
+        for b in yi:
+            if a == b == 0: 
+                continue
+            costs.append(grid[x+a][y+b])
+            neighbors.append((y+b, x+a))
+    merged_tuples = merge(neighbors, costs)
+    return(merged_tuples)
+
 
 def navigation_edges(level, cell):
     """ Provides a list of adjacent cells and their respective costs from the given cell.
@@ -51,14 +137,9 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
-
-    #check to see if the neighboring cell is a wall (X), waypoint (a,b,c,d,e), or a cell with a given cost
-    #we will return 8 tuples (up, left right, up-left, up-right, down-left, and down-right)
-    #all waypoints are assumed to have a cost of 1
-    #to find the path cost computation, we need to use the euclidean distance formula
-    #path cost computation for horizontal or vertical movement: 0.5 * (cost of cell 1 + cost cell 2)
-    #path cost computation for diagonal movement: 0.5*sqrt(2) * (cost of cell 1 + cost of cell 2)
-    pass
+    new_level = level_to_list(level)
+    x,y = cell
+    return(findNeighbors(new_level, x, y))
 
 
 def test_route(filename, src_waypoint, dst_waypoint):
