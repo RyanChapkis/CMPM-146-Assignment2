@@ -21,27 +21,32 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
     fringe = [(0, initial_position, [initial_position])]       # structure = (cost, position, path to position from start)
     explored = {initial_position: 0}                           # dictionary of explored nodes with positions as the keys
 
+    # While we still have unknown states that we can visit
     while len(fringe) != 0:
         currentState = heappop(fringe)
-        currentCost = currentState[0]
+
+        currentCost = currentState[0]   # Breaking up the fringe tuple
         currentPos = currentState[1]
         currentPath = currentState[2]
 
+        # If we have reached our destination, return the path we used to get here
         if currentPos == destination:
             return currentPath
 
         explored[currentPos] = currentCost  # Dictionary of explored nodes, with nodes as keys and their min cost
 
-        neighbors = adj(graph, currentPos)
+        neighbors = adj(graph, currentPos)  # Finding neighbors of the current cell using the adj parameter (always navigation_edges)
 
+        # For each neighbor the adjacency function found
         for neighbor in neighbors:
             neighborPos = neighbor[0]
             neighborCost = int(neighbor[1])
 
+            # If we have yet to explore that neighbor, then add it to the fringe as a discovered, unexplored node
             if neighborPos not in explored:
-                updatedPath = currentPath.copy()
+                updatedPath = currentPath.copy()    # Updating the neighbor's path in this manner is necessary otherwise I get an error
                 updatedPath.append(neighborPos)
-                heappush(fringe, (neighborCost, neighborPos, updatedPath))
+                heappush(fringe, (neighborCost + currentCost, neighborPos, updatedPath))
 
     return None
 
