@@ -3,7 +3,6 @@ from math import inf, sqrt
 from heapq import heappop, heappush
 from itertools import product, starmap, islice
 
-
 def dijkstras_shortest_path(initial_position, destination, graph, adj):
     """ Searches for a minimal cost path through a graph using Dijkstra's algorithm.
 
@@ -18,7 +17,34 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         Otherwise, return None.
 
     """
-    pass
+
+    fringe = [(0, initial_position, [initial_position])]       # structure = (cost, position, path to position from start)
+    explored = {initial_position: 0}                           # dictionary of explored nodes with positions as the keys
+
+    while len(fringe) != 0:
+        currentState = heappop(fringe)
+        currentCost = currentState[0]
+        currentPos = currentState[1]
+        currentPath = currentState[2]
+        neighbors = adj(graph, currentPos)
+
+        if currentPos is destination:
+            return currentPath
+
+        for neighbor in neighbors:
+            neighborPos = neighbor[0]
+            neighborCost = int(neighbor[1])
+
+            if neighborPos in explored:
+                if neighborCost < explored[currentPos]:
+                    explored[currentPos] = neighborCost + currentCost
+                if neighborCost >= explored[currentPos]:
+                    neighborCost += explored[currentPos]
+
+            currentPath.append(neightborPos)
+            heappush(fringe, (neighborCost, neighborPos, currentPath))
+
+    return None
 
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
@@ -32,7 +58,9 @@ def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     Returns:
         A dictionary, mapping destination cells to the cost of a path from the initial_position.
     """
+
     pass
+
 
 def merge(list1, list2): 
     """ Merges the list of all neighboring cells, and their corresponding costs
