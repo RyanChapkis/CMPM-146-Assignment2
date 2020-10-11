@@ -19,9 +19,9 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
     """
 
     fringe = [(0, initial_position, [initial_position])]       # structure = (cost, position, path to position from start)
-    explored = {initial_position: 0}                           # dictionary of explored nodes with positions as the keys
+    explored = {initial_position: 0}                           # dictionary of explored nodes with keys = position tuple, values = cost
 
-    # While we still have unknown states that we can visit
+    # While we still have unexplored states that we can visit
     while len(fringe) != 0:
         currentState = heappop(fringe)
 
@@ -40,15 +40,15 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         # For each neighbor the adjacency function found
         for neighbor in neighbors:
             neighborPos = neighbor[0]
-            neighborCost = int(neighbor[1])
+            neighborCost = int(neighbor[1])     # Just making sure...
 
             # If we have yet to explore that neighbor, then add it to the fringe as a discovered, unexplored node
             if neighborPos not in explored:
-                updatedPath = currentPath.copy()    # Updating the neighbor's path in this manner is necessary otherwise I get an error
+                updatedPath = currentPath.copy()    # Updating the neighbor's path in this manner is necessary, otherwise I get an error
                 updatedPath.append(neighborPos)
                 heappush(fringe, (neighborCost + currentCost, neighborPos, updatedPath))
 
-    return None
+    return None     # Just return None, we shouldn't be getting here if there is a path anyway
 
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
@@ -176,9 +176,9 @@ def navigation_edges(level, cell):
 
 def navigation_edges_2(level, cell):
     """
-    I'm speculative about the effectiveness and unnecessary amount of code for currently needed for
-    our current navigation_edges function. I wanted to make this in an attempt to see if my speculation
-    is reasonable or not.
+    A reworked navigation_edges function that works the same as current navigation_edges. This function, however, does
+    not return costs as chars; instead, it returns them as integers. Furthermore, walls are not present in the list
+    returned by this version of the function.
     """
     neighbors = []
 
@@ -234,9 +234,9 @@ def test_route(filename, src_waypoint, dst_waypoint):
     src = level['waypoints'][src_waypoint]
     dst = level['waypoints'][dst_waypoint]
 
-    print('src: ', src)
-    print('dst: ', dst)
-    print(navigation_edges_2(level, (6,8)))
+    #print('src: ', src)
+    #print('dst: ', dst)
+    #print(navigation_edges_2(level, (6,8)))
 
     # Search for and display the path from src to dst.
     path = dijkstras_shortest_path(src, dst, level, navigation_edges_2)     # THIS NEEDS TO JUST BE NAVIGATION_EDGES LATER!!!!!
@@ -276,4 +276,4 @@ if __name__ == '__main__':
     test_route(filename, src_waypoint, dst_waypoint)
 
     # Use this function to calculate the cost to all reachable cells from an origin point.
-    #cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
+    cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
