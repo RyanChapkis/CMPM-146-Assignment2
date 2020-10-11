@@ -26,23 +26,22 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         currentCost = currentState[0]
         currentPos = currentState[1]
         currentPath = currentState[2]
-        neighbors = adj(graph, currentPos)
 
-        if currentPos is destination:
+        if currentPos == destination:
             return currentPath
+
+        explored[currentPos] = currentCost  # Dictionary of explored nodes, with nodes as keys and their min cost
+
+        neighbors = adj(graph, currentPos)
 
         for neighbor in neighbors:
             neighborPos = neighbor[0]
             neighborCost = int(neighbor[1])
 
-            if neighborPos in explored:
-                if neighborCost < explored[currentPos]:
-                    explored[currentPos] = neighborCost + currentCost
-                if neighborCost >= explored[currentPos]:
-                    neighborCost += explored[currentPos]
-
-            currentPath.append(neightborPos)
-            heappush(fringe, (neighborCost, neighborPos, currentPath))
+            if neighborPos not in explored:
+                updatedPath = currentPath.copy()
+                updatedPath.append(neighborPos)
+                heappush(fringe, (neighborCost, neighborPos, updatedPath))
 
     return None
 
@@ -170,6 +169,48 @@ def navigation_edges(level, cell):
     return(findNeighbors(new_level, x, y))
 
 
+def navigation_edges_2(level, cell):
+    """
+    I'm speculative about the effectiveness and unnecessary amount of code for currently needed for
+    our current navigation_edges function. I wanted to make this in an attempt to see if my speculation
+    is reasonable or not.
+    """
+    neighbors = []
+
+    x = cell[0]
+    y = cell[1]
+    spaces = level['spaces']
+
+    up = (x, y+1)
+    down = (x, y-1)
+    left = (x-1, y)
+    right = (x+1, y)
+
+    up_left = (x-1, y+1)
+    up_right = (x+1, y+1)
+    down_left = (x-1, y-1)
+    down_right = (x+1, y-1)
+
+    if up in spaces:
+        neighbors.append((up, spaces[up]))
+    if down in spaces:
+        neighbors.append((down, spaces[down]))
+    if left in spaces:
+        neighbors.append((left, spaces[left]))
+    if right in spaces:
+        neighbors.append((right, spaces[right]))
+
+    if up_left in spaces:
+        neighbors.append((up_left, spaces[up_left]))
+    if up_right in spaces:
+        neighbors.append((up_right, spaces[up_right]))
+    if down_left in spaces:
+        neighbors.append((down_left, spaces[down_left]))
+    if down_right in spaces:
+        neighbors.append((down_right, spaces[down_right]))
+
+    return neighbors
+
 def test_route(filename, src_waypoint, dst_waypoint):
     """ Loads a level, searches for a path between the given waypoints, and displays the result.
 
@@ -188,8 +229,12 @@ def test_route(filename, src_waypoint, dst_waypoint):
     src = level['waypoints'][src_waypoint]
     dst = level['waypoints'][dst_waypoint]
 
+    print('src: ', src)
+    print('dst: ', dst)
+    print(navigation_edges_2(level, (6,8)))
+
     # Search for and display the path from src to dst.
-    path = dijkstras_shortest_path(src, dst, level, navigation_edges)
+    path = dijkstras_shortest_path(src, dst, level, navigation_edges_2)     # THIS NEEDS TO JUST BE NAVIGATION_EDGES LATER!!!!!
     if path:
         show_level(level, path)
     else:
@@ -226,4 +271,4 @@ if __name__ == '__main__':
     test_route(filename, src_waypoint, dst_waypoint)
 
     # Use this function to calculate the cost to all reachable cells from an origin point.
-    cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
+    #cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
