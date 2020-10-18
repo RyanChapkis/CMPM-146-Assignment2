@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6f74bdf1-beaa-48a3-9def-33c11020527d" name="Default Changelist" comment="" />
+    <list default="true" id="6f74bdf1-beaa-48a3-9def-33c11020527d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/CMPM-146-Assignment-1-main/p1.py" beforeDir="false" afterPath="$PROJECT_DIR$/CMPM-146-Assignment-1-main/p1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMPM-146-Assignment-1-main/~$_ Dijkstra’s in a Dungeon.docx" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1iWdArzvbONhQkQMZMJ72m0nxtl" />
   <component name="ProjectViewState">
@@ -15,9 +21,15 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/CMPM-146-Assignment-2-main" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="421" y="99" key="FileChooserDialogImpl" timestamp="1602975591563">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="421" y="99" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1602975591563" />
   </component>
 </project>
