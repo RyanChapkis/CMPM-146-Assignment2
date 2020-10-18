@@ -84,17 +84,13 @@ def find_path (source_point, destination_point, mesh):
 
     start_heuristic = euclidean_dist(source_point, destination_point)
 
-    frontier = []
-    heapq.heappush(frontier, (start_heuristic, source_box, source_point))
+    frontier = [(start_heuristic, source_box, source_point)]
 
     boxes[source_box] = None
     detail_points[source_box] = source_point
 
     while(len(frontier) > 0):
-        heap_retrieval = heapq.heappop(frontier) #This gets a tuple, which is the box and point
-        priority = heap_retrieval[0]
-        current_box = heap_retrieval[1]
-        current_point = heap_retrieval[2]
+        priority, current_box, current_point = heapq.heappop(frontier)
 
         if current_box == dest_box:
             # Insert current_box into boxes, w/ previous as value
@@ -117,10 +113,8 @@ def find_path (source_point, destination_point, mesh):
                     constrain(neighborPoint.x, rangeX)
                     constrain(neighborPoint.y, rangeY)
                 """
-                xMin = max(current_box[0], neighbor[0])
-                xMax = min(current_box[1], neighbor[1])
-                yMin = max(current_box[2], neighbor[2])
-                yMax = min(current_box[3], neighbor[3])
+                xMin, yMin = max(current_box[0], neighbor[0]), max(current_box[2], neighbor[2])
+                xMax, yMax = min(current_box[1], neighbor[1]), min(current_box[3], neighbor[3])
                              
                 clamp_pointX = max(xMin, min(current_point[0], xMax))
                 clamp_pointY = max(yMin, min(current_point[1], yMax))
