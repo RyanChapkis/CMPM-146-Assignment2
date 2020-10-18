@@ -9,7 +9,12 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "D:/Programs/python.exe \"c:/Users/santi/Documents/CSEprojects/Game AI/Assignment 2/CMPM-146-Assignment2/P__export/src/p2_interactive.py\" ../input/homer.png ../input/homer.png.mesh.pickle 2",
+            "program": "c:/Users/santi/Documents/CSEprojects/Game AI/Assignment 2/CMPM-146-Assignment2/P__export/src/p2_interactive.py",
+            "args": [
+                "../input/homer.png",
+                "../input/homer.png.mesh.pickle",
+                "2"
+            ],
             "console": "integratedTerminal"
         }
     ]

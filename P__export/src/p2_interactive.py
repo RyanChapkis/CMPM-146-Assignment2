@@ -90,3 +90,4 @@ canvas.bind('<Button-1>', on_click)
 
 redraw()
 master.mainloop()
+
