@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "C:/Users/santi/Documents/CSEprojects/Game AI/Assignment 2/CMPM-146-Assignment2/CMPM-146-Assignment-2-main/P__export/src/p2_interactive.py",
+            "args":
+            [
+                "../input/homer.png",
+                "../input/homer.png.mesh.pickle", 
+                "2"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}
