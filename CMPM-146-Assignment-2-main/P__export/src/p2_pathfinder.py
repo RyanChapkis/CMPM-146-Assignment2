@@ -79,14 +79,14 @@ def find_path (source_point, destination_point, mesh):
     path_taken = []
 
     #the distance traversed thus far
-    distance_so_far = {} #Same as cost_so_far
+    distance_so_far = {}
     distance_so_far[source_point] = 0
 
     start_heuristic = euclidean_dist(source_point, destination_point)
 
     frontier = [(start_heuristic, source_box, source_point)]
 
-    boxes[source_box] = None #Same as came_from
+    boxes[source_box] = None
     detail_points[source_box] = source_point
 
     while(len(frontier) > 0):
@@ -94,7 +94,7 @@ def find_path (source_point, destination_point, mesh):
 
         if current_box == dest_box:
             # Insert current_box into boxes, w/ previous as value
-            #path.append(destination_point)
+            path.append(destination_point)
             while(current_box != None):
                 path_taken.append(current_box)
                 path.append(detail_points[current_box])
@@ -103,30 +103,32 @@ def find_path (source_point, destination_point, mesh):
 
         neighbors = mesh['adj'][current_box] #Hopefully this gets the neighbor list?
         for neighbor in neighbors:
+            if(neighbor not in boxes):
 
-            """
-            Take current point and constrain it within the range of the current neighbors
-                rangeX = currentBox(x1 - x2) * neighborbox(x1 - x2)
-                rangeY = currentBox(y1 - y2) * neighborBox(y1 - y2)
-                neighborPoint = current_point
-                constrain(neighborPoint.x, rangeX)
-                constrain(neighborPoint.y, rangeY)
-            """
-            xMin, yMin = max(current_box[0], neighbor[0]), max(current_box[2], neighbor[2])
-            xMax, yMax = min(current_box[1], neighbor[1]), min(current_box[3], neighbor[3])
+                """
+                Take current point and constrain it within the range of the current neighbors
+                    rangeX = currentBox(x1 - x2) * neighborbox(x1 - x2)
+                    rangeY = currentBox(y1 - y2) * neighborBox(y1 - y2)
+                    neighborPoint = current_point
+                    constrain(neighborPoint.x, rangeX)
+                    constrain(neighborPoint.y, rangeY)
+                """
+                xMin, yMin = max(current_box[0], neighbor[0]), max(current_box[2], neighbor[2])
+                xMax, yMax = min(current_box[1], neighbor[1]), min(current_box[3], neighbor[3])
                              
-            clamp_pointX = max(xMin, min(current_point[0], xMax))
-            clamp_pointY = max(yMin, min(current_point[1], yMax))
-            neighbor_point = (clamp_pointX, clamp_pointY)
+                clamp_pointX = max(xMin, min(current_point[0], xMax))
+                clamp_pointY = max(yMin, min(current_point[1], yMax))
+                neighbor_point = (clamp_pointX, clamp_pointY)
 
-            new_distance = distance_so_far[current_point] + euclidean_dist(current_point, neighbor_point)
-            
-            if neighbor_point not in distance_so_far or new_distance < distance_so_far[neighbor_point]:
-                distance_so_far[neighbor_point] = new_distance
-                priority = new_distance + euclidean_dist(neighbor_point, destination_point)
+                new_distance = distance_so_far[current_point] + euclidean_dist(current_point, neighbor_point)
 
-                boxes[neighbor] = current_box #Add neighbor to list of boxes, w/ came from being current box
-                detail_points[neighbor] = neighbor_point #Add neighbor and its point to point list
-                heapq.heappush(frontier, (priority, neighbor, neighbor_point))
+                #if new_distance < distance_so_far[neighbor_point]:
+                if neighbor not in boxes or new_distance < distance_so_far[neighbor_point]:
+                    distance_so_far[neighbor_point] = new_distance
+                    priority = new_distance + int(euclidean_dist(neighbor_point, destination_point))
+
+                    boxes[neighbor] = current_box #Add neighbor to list of boxes
+                    detail_points[neighbor] = neighbor_point #Add neighbor and its point to point list
+                    heapq.heappush(frontier, (priority, neighbor, neighbor_point))
 
     return path, path_taken #Replaced boxes.keys() w/ path_taken
