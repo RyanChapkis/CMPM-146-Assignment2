@@ -54,7 +54,7 @@ def find_path (source_point, destination_point, mesh):
     source_box = (0, 0, 0, 0)
     dest_box = (0, 0, 0, 0)
     forward_points = {} #a dictionary the maps boxes to (x,y) pairs.
-    backward_ponts = {}
+    backward_points = {}
 
     """
     How to do point to point:
@@ -84,12 +84,12 @@ def find_path (source_point, destination_point, mesh):
     backward_dist[destination_point] = 0
 
     forward_points[source_box] = source_point
-    backward_ponts[dest_box] = destination_point
+    backward_points[dest_box] = destination_point
 
     start_heuristic = euclidean_dist(source_point, destination_point)
     #Forth item is the goal
-    frontier = [(start_heuristic, source_box, source_point, dest_box)]
-    heapq.heappush(frontier, (start_heuristic, dest_box, destination_point, source_box))
+    frontier = [(start_heuristic, source_box, source_point, 'destination')]
+    heapq.heappush(frontier, (start_heuristic, dest_box, destination_point, 'start'))
 
     #previous boxes that have been traversed
     boxes = {}
@@ -104,10 +104,10 @@ def find_path (source_point, destination_point, mesh):
     backward_prev[dest_box] = None
 
     while(len(frontier) > 0):
-        priority, current_box, current_point, current_goal = heapq.heappop(frontier)
+        priority, current_box, current_point, point_of_interest = heapq.heappop(frontier)
 
         #Forward: Check if current is in the previously traversed backward space
-        if current_goal == dest_box and current_box in backward_prev:
+        if point_of_interest == 'destination' and current_box in backward_prev:
             # Insert current_box into boxes, w/ previous as value
             clone = backward_prev[current_box]
             while current_box is not None:
@@ -116,16 +116,16 @@ def find_path (source_point, destination_point, mesh):
                 current_box = forward_prev[current_box] #destination point should already have something in boxes
             while clone is not None:
                 path_taken.insert(0, clone)
-                path.insert(0, backward_ponts[clone])
+                path.insert(0, backward_points[clone])
                 clone = backward_prev[clone]
             break
         #Backward: Check if current is in the previously traversed forward space
-        elif current_goal == source_box and current_box in forward_prev:
+        elif point_of_interest == 'start' and current_box in forward_prev:
             # Insert current_box into boxes, w/ previous as value
             clone = forward_prev[current_box]
             while current_box is not None:
                 path_taken.append(current_box)
-                path.append(backward_ponts[current_box])
+                path.append(backward_points[current_box])
                 current_box = backward_prev[current_box] #destination point should already have something in boxes
             while clone is not None:
                 path_taken.insert(0, clone)
@@ -133,53 +133,56 @@ def find_path (source_point, destination_point, mesh):
                 clone = forward_prev[clone]
             break
 
-        neighbors = mesh['adj'][current_box] #Hopefully this gets the neighbor list?
-        for neighbor in neighbors:
-            if current_goal == dest_box and neighbor not in forward_prev:
+        try: 
+            neighbors = mesh['adj'][current_box] #Hopefully this gets the neighbor list?
+            for neighbor in neighbors:
+                if point_of_interest == 'destination' and neighbor not in forward_prev:
 
-                """
-                Take current point and constrain it within the range of the current neighbors
-                    rangeX = currentBox(x1 - x2) * neighborbox(x1 - x2)
-                    rangeY = currentBox(y1 - y2) * neighborBox(y1 - y2)
-                    neighborPoint = current_point
-                    constrain(neighborPoint.x, rangeX)
-                    constrain(neighborPoint.y, rangeY)
-                """
-                xMin, yMin = max(current_box[0], neighbor[0]), max(current_box[2], neighbor[2])
-                xMax, yMax = min(current_box[1], neighbor[1]), min(current_box[3], neighbor[3])
-                             
-                clamp_pointX = max(xMin, min(current_point[0], xMax))
-                clamp_pointY = max(yMin, min(current_point[1], yMax))
-                neighbor_point = (clamp_pointX, clamp_pointY)
+                    """
+                    Take current point and constrain it within the range of the current neighbors
+                        rangeX = currentBox(x1 - x2) * neighborbox(x1 - x2)
+                        rangeY = currentBox(y1 - y2) * neighborBox(y1 - y2)
+                        neighborPoint = current_point
+                        constrain(neighborPoint.x, rangeX)
+                        constrain(neighborPoint.y, rangeY)
+                    """
+                    xMin, yMin = max(current_box[0], neighbor[0]), max(current_box[2], neighbor[2])
+                    xMax, yMax = min(current_box[1], neighbor[1]), min(current_box[3], neighbor[3])
+                                
+                    clamp_pointX = max(xMin, min(current_point[0], xMax))
+                    clamp_pointY = max(yMin, min(current_point[1], yMax))
+                    neighbor_point = (clamp_pointX, clamp_pointY)
 
-                new_distance = forward_dist[current_point] + euclidean_dist(current_point, neighbor_point)
-                
-                #if new_distance < distance_so_far[neighbor_point]:
-                if neighbor not in forward_prev or new_distance < forward_dist[neighbor_point]:
-                    forward_dist[neighbor_point] = new_distance
-                    priority = new_distance + int(euclidean_dist(neighbor_point, destination_point))
+                    new_distance = forward_dist[current_point] + euclidean_dist(current_point, neighbor_point)
+                    
+                    #if new_distance < distance_so_far[neighbor_point]:
+                    if neighbor not in forward_prev or new_distance < forward_dist[neighbor_point]:
+                        forward_dist[neighbor_point] = new_distance
+                        priority = new_distance + int(euclidean_dist(neighbor_point, destination_point))
 
-                    forward_prev[neighbor] = current_box #Add neighbor to list of boxes
-                    forward_points[neighbor] = neighbor_point #Add neighbor and its point to point list
-                    heapq.heappush(frontier, (priority, neighbor, neighbor_point, current_goal))
-            elif current_goal == source_box and neighbor not in backward_prev:
+                        forward_prev[neighbor] = current_box #Add neighbor to list of boxes
+                        forward_points[neighbor] = neighbor_point #Add neighbor and its point to point list
+                        heapq.heappush(frontier, (priority, neighbor, neighbor_point, 'destination'))
+                elif point_of_interest == 'start' and neighbor not in backward_prev:
 
-                xMin, yMin = max(current_box[0], neighbor[0]), max(current_box[2], neighbor[2])
-                xMax, yMax = min(current_box[1], neighbor[1]), min(current_box[3], neighbor[3])
-                             
-                clamp_pointX = max(xMin, min(current_point[0], xMax))
-                clamp_pointY = max(yMin, min(current_point[1], yMax))
-                neighbor_point = (clamp_pointX, clamp_pointY)
+                    xMin, yMin = max(current_box[0], neighbor[0]), max(current_box[2], neighbor[2])
+                    xMax, yMax = min(current_box[1], neighbor[1]), min(current_box[3], neighbor[3])
+                                
+                    clamp_pointX = max(xMin, min(current_point[0], xMax))
+                    clamp_pointY = max(yMin, min(current_point[1], yMax))
+                    neighbor_point = (clamp_pointX, clamp_pointY)
 
-                new_distance = backward_dist[current_point] + euclidean_dist(current_point, neighbor_point)
-                
-                #if new_distance < distance_so_far[neighbor_point]:
-                if neighbor not in backward_prev or new_distance < backward_prev[neighbor_point]:
-                    backward_dist[neighbor_point] = new_distance
-                    priority = new_distance + int(euclidean_dist(neighbor_point, source_point))
+                    new_distance = backward_dist[current_point] + euclidean_dist(current_point, neighbor_point)
+                    
+                    #if new_distance < distance_so_far[neighbor_point]:
+                    if neighbor not in backward_prev or new_distance < backward_prev[neighbor_point]:
+                        backward_dist[neighbor_point] = new_distance
+                        priority = new_distance + int(euclidean_dist(neighbor_point, source_point))
 
-                    backward_prev[neighbor] = current_box #Add neighbor to list of boxes
-                    backward_ponts[neighbor] = neighbor_point #Add neighbor and its point to point list
-                    heapq.heappush(frontier, (priority, neighbor, neighbor_point, current_goal))
+                        backward_prev[neighbor] = current_box #Add neighbor to list of boxes
+                        backward_points[neighbor] = neighbor_point #Add neighbor and its point to point list
+                        heapq.heappush(frontier, (priority, neighbor, neighbor_point, 'start'))
+        except KeyError:
+            print('No Path!')
 
     return path, path_taken #Replaced boxes.keys() w/ path_taken
